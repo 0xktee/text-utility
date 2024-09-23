@@ -1,7 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @layer base {
+  @font-face {
+    font-family: "JetBrains Mono";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(/fonts/jetbrains-mono/JetBrainsMono-Regular.woff2) format("woff2");
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;

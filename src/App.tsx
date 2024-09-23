@@ -1,10 +1,11 @@
-import React, { type ChangeEvent } from "react"
+import React from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { SubmitErrorHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 import _ from "lodash"
 
+import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import {
   Form,
@@ -15,13 +16,7 @@ import {
   FormLabel
 } from "@/components/ui/form"
 import { toast } from "@/hooks/use-toast"
-import {
-  convertToMarkdown,
-  toCamelCase,
-  toDefault,
-  toKebabCase,
-  toSnakeCase
-} from "./lib/converter"
+import { convertText } from "./lib/conversion"
 import { Button } from "./components/ui/button"
 import { Input } from "./components/ui/input"
 import {
@@ -31,85 +26,53 @@ import {
   SelectTrigger,
   SelectValue
 } from "./components/ui/select"
+import { CAMEL_CASE, TEXT_STYLES } from "./constant/text"
 
 const FormSchema = z.object({
   input: z.string(),
   case: z.string().optional(),
   prefix: z.string().optional(),
   suffix: z.string().optional(),
-  above: z.string().optional(),
+  prepend: z.string().optional(),
   preset: z.string().optional()
 })
 
-function App() {
+export default function App() {
   const [result, setResult] = React.useState<string>()
-
-  const textAreaRef = React.useRef<HTMLTextAreaElement | null>(null)
-
-  React.useEffect(() => {
-    // initiate textarea height
-    if (textAreaRef.current) {
-      textAreaRef.current.style.height = "2.5rem" // equals min-h-10, 2.5rem, and 40px
-      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight + 1}px`
-    }
-
-    return () => {}
-  }, [])
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { case: "camel" }
+    defaultValues: { case: CAMEL_CASE }
   })
-
-  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    form.setValue("input", e.target.value)
-
-    // update textarea height on value changed
-    if (textAreaRef.current) {
-      textAreaRef.current.style.height = "2.5rem"
-      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight + 1}px`
-    }
-  }
 
   const handlePresetChange = (value: string) => {
     switch (value) {
       case "csv":
-        form.setValue("case", "camel")
+        form.setValue("case", CAMEL_CASE)
         form.setValue("prefix", "private String ")
         form.setValue("suffix", ";")
-        form.setValue("above", "\n@CsvBindPosition(position = {INDEX})")
+        form.setValue("prepend", "\n@CsvBindPosition(position = {INDEX})")
+        break
+      case "entity":
+        form.setValue("case", CAMEL_CASE)
+        form.setValue("prefix", "private String ")
+        form.setValue("suffix", ";")
+        form.setValue("prepend", '\n@Column(name = "{ORIGINAL_VALUE}")')
         break
     }
   }
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data)
-    let textList: Array<string> = []
-    if (!_.isEmpty(data.input)) {
-      switch (data.case) {
-        case "camel":
-          textList = toCamelCase(data.input)
-          break
-        case "snake":
-          textList = toSnakeCase(data.input)
-          break
-        case "kebab":
-          textList = toKebabCase(data.input)
-          break
-        case "none":
-        default:
-          textList = toDefault(data.input)
-          break
-      }
+    if (data.input && data.case) {
+      const displayText = convertText(data.input, data.case, {
+        prefix: data.prefix ? data.prefix : "",
+        suffix: data.suffix ? data.suffix : "",
+        prepend: data.prepend ? data.prepend : ""
+      })
+
+      setResult(displayText)
     }
-
-    const markdownText = convertToMarkdown(textList, {
-      prefix: data.prefix,
-      suffix: data.suffix,
-      above: data.above
-    })
-
-    setResult(markdownText)
   }
 
   const onError: SubmitErrorHandler<z.infer<typeof FormSchema>> = (error) => {
@@ -136,32 +99,20 @@ function App() {
                   <FormItem className="min-h-[50%]">
                     <FormControl>
                       <Textarea
+                        className="resize-none h-full font-mono"
                         placeholder="Enter your text here... (multiple lines allowed)"
-                        className="resize-none min-h-full max-h-full"
-                        onChange={handleChange}
-                        ref={(e) => {
-                          field.ref(e)
-                          textAreaRef.current = e
-                        }}
-                        style={{
-                          fontFamily:
-                            "JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace"
-                        }}
+                        {...field}
                       />
                     </FormControl>
                   </FormItem>
                 )}
               />
-              <div className="grow">
+              <div className="grow relative">
                 <Textarea
-                  className="resize-none min-h-full max-h-full"
+                  className="resize-none h-full font-mono"
                   placeholder="Converted result will appear here"
                   disabled={_.isEmpty(result)}
                   value={result}
-                  style={{
-                    fontFamily:
-                      "JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace"
-                  }}
                 />
               </div>
             </div>
@@ -173,17 +124,18 @@ function App() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Convert to</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue="camel">
+                  <Select onValueChange={field.onChange} defaultValue={CAMEL_CASE}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a case to be converted" />
+                        <SelectValue placeholder="Select case to be converted" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      <SelectItem value="camel">camelCase</SelectItem>
-                      <SelectItem value="snake">SNAKE_CASE</SelectItem>
-                      <SelectItem value="kebab">kebab-case</SelectItem>
+                      {TEXT_STYLES.map((style, index) => (
+                        <SelectItem key={index} value={style.value}>
+                          {style.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -218,7 +170,7 @@ function App() {
               )}
             />
             <FormField
-              name="above"
+              name="prepend"
               render={({ field }) => (
                 <FormItem>
                   <div className="space-y-0">
@@ -241,6 +193,8 @@ function App() {
               Convert
             </Button>
 
+            <Separator />
+
             <FormField
               name="preset"
               render={() => (
@@ -254,7 +208,8 @@ function App() {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="none">None</SelectItem>
-                      <SelectItem value="csv">Add CSV position JAVA</SelectItem>
+                      <SelectItem value="csv">@CsvBindPosition for Java</SelectItem>
+                      <SelectItem value="entity">@Column for Java</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -266,5 +221,3 @@ function App() {
     </Form>
   )
 }
-
-export default App
