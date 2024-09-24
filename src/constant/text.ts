@@ -1,5 +1,6 @@
 export const ARG_INDEX = "{INDEX}"
 export const ARG_ORIGINAL_VALUE = "{ORIGINAL_VALUE}"
+export const ARG_CONVERTED_VALUE = "{CONVERTED_VALUE}"
 
 export const CAMEL_CASE = "camel"
 export const SNAKE_CASE = "snake"

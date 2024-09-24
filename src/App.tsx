@@ -27,10 +27,11 @@ import {
   SelectValue
 } from "./components/ui/select"
 import { CAMEL_CASE, TEXT_STYLES } from "./constant/text"
+import { SETTING_PRESETS } from "./constant/preset"
 
 const FormSchema = z.object({
   input: z.string(),
-  case: z.string().optional(),
+  toStyle: z.string().optional(),
   prefix: z.string().optional(),
   suffix: z.string().optional(),
   prepend: z.string().optional(),
@@ -42,30 +43,36 @@ export default function App() {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { case: CAMEL_CASE }
+    defaultValues: { toStyle: CAMEL_CASE }
   })
 
   const handlePresetChange = (value: string) => {
     switch (value) {
       case "csv":
-        form.setValue("case", CAMEL_CASE)
+        form.setValue("toStyle", CAMEL_CASE)
         form.setValue("prefix", "private String ")
         form.setValue("suffix", ";")
         form.setValue("prepend", "\n@CsvBindPosition(position = {INDEX})")
         break
       case "entity":
-        form.setValue("case", CAMEL_CASE)
+        form.setValue("toStyle", CAMEL_CASE)
         form.setValue("prefix", "private String ")
         form.setValue("suffix", ";")
         form.setValue("prepend", '\n@Column(name = "{ORIGINAL_VALUE}")')
+        break
+      case "json":
+        form.setValue("toStyle", CAMEL_CASE)
+        form.setValue("prefix", "private String ")
+        form.setValue("suffix", ";")
+        form.setValue("prepend", '\n@JsonProperty("{CONVERTED_VALUE}")')
         break
     }
   }
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data)
-    if (data.input && data.case) {
-      const displayText = convertText(data.input, data.case, {
+    if (data.input && data.toStyle) {
+      const displayText = convertText(data.input, data.toStyle, {
         prefix: data.prefix ? data.prefix : "",
         suffix: data.suffix ? data.suffix : "",
         prepend: data.prepend ? data.prepend : ""
@@ -91,7 +98,7 @@ export default function App() {
       >
         <div className="flex h-full space-x-6">
           <div className="flex-1">
-            <div className="flex flex-col h-full space-y-1">
+            <div className="flex flex-col h-full space-y-2">
               <FormField
                 control={form.control}
                 name="input"
@@ -120,14 +127,14 @@ export default function App() {
 
           <div className="flex-none min-w-80 space-y-4">
             <FormField
-              name="case"
+              name="toStyle"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Convert to</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={CAMEL_CASE}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select case to be converted" />
+                        <SelectValue placeholder="Select style to be converted" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -174,7 +181,7 @@ export default function App() {
               render={({ field }) => (
                 <FormItem>
                   <div className="space-y-0">
-                    <FormLabel>Above</FormLabel>
+                    <FormLabel>Prepend</FormLabel>
                     <FormDescription>
                       Add text above each line, supported multiple lines.
                     </FormDescription>
@@ -208,8 +215,11 @@ export default function App() {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="none">None</SelectItem>
-                      <SelectItem value="csv">@CsvBindPosition for Java</SelectItem>
-                      <SelectItem value="entity">@Column for Java</SelectItem>
+                      {SETTING_PRESETS.map((preset, index) => (
+                        <SelectItem key={index} value={preset.value}>
+                          {preset.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormItem>
