@@ -47,26 +47,36 @@ export default function App() {
   })
 
   const handlePresetChange = (value: string) => {
-    switch (value) {
-      case "csv":
-        form.setValue("toStyle", CAMEL_CASE)
-        form.setValue("prefix", "private String ")
-        form.setValue("suffix", ";")
-        form.setValue("prepend", "\n@CsvBindPosition(position = {INDEX})")
-        break
-      case "entity":
-        form.setValue("toStyle", CAMEL_CASE)
-        form.setValue("prefix", "private String ")
-        form.setValue("suffix", ";")
-        form.setValue("prepend", '\n@Column(name = "{ORIGINAL_VALUE}")')
-        break
-      case "json":
-        form.setValue("toStyle", CAMEL_CASE)
-        form.setValue("prefix", "private String ")
-        form.setValue("suffix", ";")
-        form.setValue("prepend", '\n@JsonProperty("{CONVERTED_VALUE}")')
-        break
+    const preset = SETTING_PRESETS.find((preset) => preset.value === value)
+
+    if (preset) {
+      const { toStyle, prefix, suffix, prepend } = preset.field
+      form.setValue("toStyle", toStyle)
+      form.setValue("prefix", prefix)
+      form.setValue("suffix", suffix)
+      form.setValue("prepend", prepend)
     }
+
+    // switch (value) {
+    //   case "csvBindPositionJava":
+    //     form.setValue("toStyle", CAMEL_CASE)
+    //     form.setValue("prefix", "private String ")
+    //     form.setValue("suffix", ";")
+    //     form.setValue("prepend", "\n@CsvBindPosition(position = {INDEX})")
+    //     break
+    //   case "columnJava":
+    //     form.setValue("toStyle", CAMEL_CASE)
+    //     form.setValue("prefix", "private String ")
+    //     form.setValue("suffix", ";")
+    //     form.setValue("prepend", '\n@Column(name = "{ORIGINAL_VALUE}")')
+    //     break
+    //   case "jsonPropertyJava":
+    //     form.setValue("toStyle", CAMEL_CASE)
+    //     form.setValue("prefix", "private String ")
+    //     form.setValue("suffix", ";")
+    //     form.setValue("prepend", '\n@JsonProperty("{CONVERTED_VALUE}")')
+    //     break
+    // }
   }
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
