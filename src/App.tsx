@@ -1,9 +1,6 @@
-import React from "react"
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { SubmitErrorHandler, useForm } from "react-hook-form"
 import { z } from "zod"
-import _ from "lodash"
 
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
@@ -26,8 +23,10 @@ import {
   SelectTrigger,
   SelectValue
 } from "./components/ui/select"
+
 import { CAMEL_CASE, TEXT_STYLES } from "./constant/text"
-import { SETTING_PRESETS } from "./constant/preset"
+import PresetDropdown from "./components/preset-dropdown"
+import LineCountBadge from "./components/line-count-badge"
 
 const FormSchema = z.object({
   input: z.string(),
@@ -35,60 +34,27 @@ const FormSchema = z.object({
   prefix: z.string().optional(),
   suffix: z.string().optional(),
   prepend: z.string().optional(),
-  preset: z.string().optional()
+  output: z.string().optional().readonly() // using only for display result
 })
 
 export default function App() {
-  const [result, setResult] = React.useState<string>()
-
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: { toStyle: CAMEL_CASE }
   })
 
-  const handlePresetChange = (value: string) => {
-    const preset = SETTING_PRESETS.find((preset) => preset.value === value)
-
-    if (preset) {
-      const { toStyle, prefix, suffix, prepend } = preset.field
-      form.setValue("toStyle", toStyle)
-      form.setValue("prefix", prefix)
-      form.setValue("suffix", suffix)
-      form.setValue("prepend", prepend)
-    }
-
-    // switch (value) {
-    //   case "csvBindPositionJava":
-    //     form.setValue("toStyle", CAMEL_CASE)
-    //     form.setValue("prefix", "private String ")
-    //     form.setValue("suffix", ";")
-    //     form.setValue("prepend", "\n@CsvBindPosition(position = {INDEX})")
-    //     break
-    //   case "columnJava":
-    //     form.setValue("toStyle", CAMEL_CASE)
-    //     form.setValue("prefix", "private String ")
-    //     form.setValue("suffix", ";")
-    //     form.setValue("prepend", '\n@Column(name = "{ORIGINAL_VALUE}")')
-    //     break
-    //   case "jsonPropertyJava":
-    //     form.setValue("toStyle", CAMEL_CASE)
-    //     form.setValue("prefix", "private String ")
-    //     form.setValue("suffix", ";")
-    //     form.setValue("prepend", '\n@JsonProperty("{CONVERTED_VALUE}")')
-    //     break
-    // }
-  }
+  form.watch("input")
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data)
     if (data.input && data.toStyle) {
-      const displayText = convertText(data.input, data.toStyle, {
+      const resultText = convertText(data.input, data.toStyle, {
         prefix: data.prefix ? data.prefix : "",
         suffix: data.suffix ? data.suffix : "",
         prepend: data.prepend ? data.prepend : ""
       })
 
-      setResult(displayText)
+      form.setValue("output", resultText)
     }
   }
 
@@ -113,7 +79,7 @@ export default function App() {
                 control={form.control}
                 name="input"
                 render={({ field }) => (
-                  <FormItem className="min-h-[50%]">
+                  <FormItem className="relative min-h-[50%]">
                     <FormControl>
                       <Textarea
                         className="resize-none h-full font-mono"
@@ -121,15 +87,26 @@ export default function App() {
                         {...field}
                       />
                     </FormControl>
+                    <LineCountBadge name="input" className="absolute bottom-2 right-2" />
                   </FormItem>
                 )}
               />
               <div className="grow relative">
-                <Textarea
-                  className="resize-none h-full font-mono"
-                  placeholder="Converted result will appear here"
-                  disabled={_.isEmpty(result)}
-                  value={result}
+                <FormField
+                  control={form.control}
+                  name="output"
+                  render={({ field }) => (
+                    <FormItem className="relative h-full">
+                      <FormControl>
+                        <Textarea
+                          className="resize-none h-full font-mono"
+                          placeholder="Converted result will appear here"
+                          {...field}
+                        />
+                      </FormControl>
+                      <LineCountBadge name="output" className="absolute bottom-2 right-2" />
+                    </FormItem>
+                  )}
                 />
               </div>
             </div>
@@ -164,7 +141,7 @@ export default function App() {
                 <FormItem>
                   <div className="space-y-0">
                     <FormLabel>Prefix</FormLabel>
-                    <FormDescription>Add text before each line.</FormDescription>
+                    <FormDescription>Add text in front of each line.</FormDescription>
                   </div>
                   <FormControl>
                     <Input {...field} />
@@ -212,29 +189,7 @@ export default function App() {
 
             <Separator />
 
-            <FormField
-              name="preset"
-              render={() => (
-                <FormItem>
-                  <FormLabel>Preset</FormLabel>
-                  <Select onValueChange={handlePresetChange}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select preset" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {SETTING_PRESETS.map((preset, index) => (
-                        <SelectItem key={index} value={preset.value}>
-                          {preset.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
+            <PresetDropdown />
           </div>
         </div>
       </form>

@@ -29,8 +29,11 @@ export function convertText(text: string, toStyle: string, { prefix, suffix, pre
       .replace(ARG_INDEX, index.toString())
       .replace(ARG_ORIGINAL_VALUE, replacedArgLine)
       .replace(ARG_CONVERTED_VALUE, convertedLine)
+    const endOfLine = lines.length - 1 === index ? "" : "\n"
 
-    displayText = displayText.concat(`${replacedArgPrepend}${prefix}${convertedLine}${suffix}\n`)
+    displayText = displayText.concat(
+      `${replacedArgPrepend}${prefix}${convertedLine}${suffix}${endOfLine}`
+    )
   })
 
   return displayText
