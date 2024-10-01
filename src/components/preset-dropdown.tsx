@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
-import { SETTING_PRESETS } from "../constants/preset";
+import { SETTING_PRESETS } from "@/constants/preset";
 import { useFormContext } from "react-hook-form";
 
 export default function PresetDropdown() {

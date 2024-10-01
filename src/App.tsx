@@ -1,7 +1,16 @@
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitErrorHandler, useForm } from "react-hook-form";
-import { z } from "zod";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -12,22 +21,15 @@ import {
   FormDescription,
   FormLabel,
 } from "@/components/ui/form";
-import { toast } from "@/hooks/use-toast";
-import { convertText } from "./lib/conversion";
-import { Button } from "./components/ui/button";
-import { Input } from "./components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./components/ui/select";
 
-import { CAMEL_CASE, TEXT_STYLES } from "./constants/text";
-import PresetDropdown from "./components/preset-dropdown";
-import LineCountBadge from "./components/line-count-badge";
-import { FormSchema } from "./lib/schema";
+import PresetDropdown from "@/components/preset-dropdown";
+import LineCountBadge from "@/components/line-count-badge";
+
+import { toast } from "@/hooks/use-toast";
+import { convertText } from "@/lib/conversion";
+import { FormSchema } from "@/lib/schema";
+
+import { CAMEL_CASE, TEXT_STYLES } from "@/constants/text";
 
 export default function App() {
   const form = useForm<z.infer<typeof FormSchema>>({
