@@ -1,70 +1,62 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { SubmitErrorHandler, useForm } from "react-hook-form"
-import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitErrorHandler, useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { Separator } from "@/components/ui/separator"
-import { Textarea } from "@/components/ui/textarea"
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormField,
   FormItem,
   FormControl,
   FormDescription,
-  FormLabel
-} from "@/components/ui/form"
-import { toast } from "@/hooks/use-toast"
-import { convertText } from "./lib/conversion"
-import { Button } from "./components/ui/button"
-import { Input } from "./components/ui/input"
+  FormLabel,
+} from "@/components/ui/form";
+import { toast } from "@/hooks/use-toast";
+import { convertText } from "./lib/conversion";
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
-} from "./components/ui/select"
+  SelectValue,
+} from "./components/ui/select";
 
-import { CAMEL_CASE, TEXT_STYLES } from "./constant/text"
-import PresetDropdown from "./components/preset-dropdown"
-import LineCountBadge from "./components/line-count-badge"
-
-const FormSchema = z.object({
-  input: z.string(),
-  toStyle: z.string().optional(),
-  prefix: z.string().optional(),
-  suffix: z.string().optional(),
-  prepend: z.string().optional(),
-  output: z.string().optional().readonly() // using only for display result
-})
+import { CAMEL_CASE, TEXT_STYLES } from "./constants/text";
+import PresetDropdown from "./components/preset-dropdown";
+import LineCountBadge from "./components/line-count-badge";
+import { FormSchema } from "./lib/schema";
 
 export default function App() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { toStyle: CAMEL_CASE }
-  })
+    defaultValues: { toStyle: CAMEL_CASE },
+  });
 
-  form.watch("input")
+  form.watch("input");
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data)
+    console.log(data);
     if (data.input && data.toStyle) {
       const resultText = convertText(data.input, data.toStyle, {
         prefix: data.prefix ? data.prefix : "",
         suffix: data.suffix ? data.suffix : "",
-        prepend: data.prepend ? data.prepend : ""
-      })
+        prepend: data.prepend ? data.prepend : "",
+      });
 
-      form.setValue("output", resultText)
+      form.setValue("output", resultText);
     }
   }
 
   const onError: SubmitErrorHandler<z.infer<typeof FormSchema>> = (error) => {
-    console.error(error)
+    console.error(error);
     toast({
-      title: "Input invalid:"
+      title: "Input invalid:",
       // description: error
-    })
-  }
+    });
+  };
 
   return (
     <Form {...form}>
@@ -87,7 +79,10 @@ export default function App() {
                         {...field}
                       />
                     </FormControl>
-                    <LineCountBadge name="input" className="absolute bottom-2 right-2" />
+                    <LineCountBadge
+                      name="input"
+                      className="absolute bottom-2 right-2"
+                    />
                   </FormItem>
                 )}
               />
@@ -104,7 +99,10 @@ export default function App() {
                           {...field}
                         />
                       </FormControl>
-                      <LineCountBadge name="output" className="absolute bottom-2 right-2" />
+                      <LineCountBadge
+                        name="output"
+                        className="absolute bottom-2 right-2"
+                      />
                     </FormItem>
                   )}
                 />
@@ -118,7 +116,10 @@ export default function App() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Convert to</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={CAMEL_CASE}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={CAMEL_CASE}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select style to be converted" />
@@ -141,7 +142,9 @@ export default function App() {
                 <FormItem>
                   <div className="space-y-0">
                     <FormLabel>Prefix</FormLabel>
-                    <FormDescription>Add text in front of each line.</FormDescription>
+                    <FormDescription>
+                      Add text in front of each line.
+                    </FormDescription>
                   </div>
                   <FormControl>
                     <Input {...field} />
@@ -155,7 +158,9 @@ export default function App() {
                 <FormItem>
                   <div className="space-y-0">
                     <FormLabel>Suffix</FormLabel>
-                    <FormDescription>Add text at the end of each line.</FormDescription>
+                    <FormDescription>
+                      Add text at the end of each line.
+                    </FormDescription>
                   </div>
                   <FormControl>
                     <Input {...field} />
@@ -194,5 +199,5 @@ export default function App() {
         </div>
       </form>
     </Form>
-  )
+  );
 }
