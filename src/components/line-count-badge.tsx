@@ -1,8 +1,8 @@
-import React from "react";
-import _ from "lodash";
-import { useFormContext } from "react-hook-form";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
+import _ from 'lodash';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 export default function InputLineCountBadge({
   name,
@@ -16,10 +16,8 @@ export default function InputLineCountBadge({
   React.useEffect(() => {
     const value = watch(name) as string;
     if (value) {
-      const lines = value.split("\n");
-      const nonEmptyLines = lines.filter(
-        (line) => !_.chain(line).trim().isEmpty().value()
-      );
+      const lines = value.split('\n');
+      const nonEmptyLines = lines.filter((line) => !_.chain(line).trim().isEmpty().value());
       setTotal(lines.length);
       setNonEmpty(nonEmptyLines.length);
     } else {
@@ -30,7 +28,7 @@ export default function InputLineCountBadge({
   }, [watch(name)]);
 
   return (
-    <div className={cn("space-x-1", className)} {...props}>
+    <div className={cn('space-x-1', className)} {...props}>
       <Badge variant="outline">Non-empty lines: {nonEmpty}</Badge>
       <Badge variant="outline">Total lines: {total}</Badge>
     </div>

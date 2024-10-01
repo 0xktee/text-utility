@@ -1,18 +1,7 @@
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { SubmitErrorHandler, useForm } from "react-hook-form";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
+import { SubmitErrorHandler, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormField,
@@ -20,16 +9,23 @@ import {
   FormControl,
   FormDescription,
   FormLabel,
-} from "@/components/ui/form";
-
-import PresetDropdown from "@/components/preset-dropdown";
-import LineCountBadge from "@/components/line-count-badge";
-
-import { toast } from "@/hooks/use-toast";
-import { convertText } from "@/lib/conversion";
-import { FormSchema } from "@/lib/schema";
-
-import { CAMEL_CASE, TEXT_STYLES } from "@/constants/text";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import LineCountBadge from '@/components/line-count-badge';
+import PresetDropdown from '@/components/preset-dropdown';
+import { convertText } from '@/lib/conversion';
+import { FormSchema } from '@/lib/schema';
+import { toast } from '@/hooks/use-toast';
+import { CAMEL_CASE, TEXT_STYLES } from '@/constants/text';
 
 export default function App() {
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -37,25 +33,25 @@ export default function App() {
     defaultValues: { toStyle: CAMEL_CASE },
   });
 
-  form.watch("input");
+  form.watch('input');
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data);
     if (data.input && data.toStyle) {
       const resultText = convertText(data.input, data.toStyle, {
-        prefix: data.prefix ? data.prefix : "",
-        suffix: data.suffix ? data.suffix : "",
-        prepend: data.prepend ? data.prepend : "",
+        prefix: data.prefix ? data.prefix : '',
+        suffix: data.suffix ? data.suffix : '',
+        prepend: data.prepend ? data.prepend : '',
       });
 
-      form.setValue("output", resultText);
+      form.setValue('output', resultText);
     }
   }
 
   const onError: SubmitErrorHandler<z.infer<typeof FormSchema>> = (error) => {
     console.error(error);
     toast({
-      title: "Input invalid:",
+      title: 'Input invalid:',
       // description: error
     });
   };
@@ -81,10 +77,7 @@ export default function App() {
                         {...field}
                       />
                     </FormControl>
-                    <LineCountBadge
-                      name="input"
-                      className="absolute bottom-2 right-2"
-                    />
+                    <LineCountBadge name="input" className="absolute bottom-2 right-2" />
                   </FormItem>
                 )}
               />
@@ -101,10 +94,7 @@ export default function App() {
                           {...field}
                         />
                       </FormControl>
-                      <LineCountBadge
-                        name="output"
-                        className="absolute bottom-2 right-2"
-                      />
+                      <LineCountBadge name="output" className="absolute bottom-2 right-2" />
                     </FormItem>
                   )}
                 />
@@ -112,16 +102,13 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex-none min-w-80 space-y-4">
+          <div className="flex-none w-80 space-y-4">
             <FormField
               name="toStyle"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Convert to</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={CAMEL_CASE}
-                  >
+                  <Select onValueChange={field.onChange} defaultValue={CAMEL_CASE}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select style to be converted" />
@@ -144,9 +131,7 @@ export default function App() {
                 <FormItem>
                   <div className="space-y-0">
                     <FormLabel>Prefix</FormLabel>
-                    <FormDescription>
-                      Add text in front of each line.
-                    </FormDescription>
+                    <FormDescription>Add text in front of each line.</FormDescription>
                   </div>
                   <FormControl>
                     <Input {...field} />
@@ -160,9 +145,7 @@ export default function App() {
                 <FormItem>
                   <div className="space-y-0">
                     <FormLabel>Suffix</FormLabel>
-                    <FormDescription>
-                      Add text at the end of each line.
-                    </FormDescription>
+                    <FormDescription>Add text at the end of each line.</FormDescription>
                   </div>
                   <FormControl>
                     <Input {...field} />
@@ -184,7 +167,7 @@ export default function App() {
                     <Textarea className="resize-none" {...field} />
                   </FormControl>
                   <FormDescription>
-                    {"Use {INDEX} to append index number for each above line."}
+                    {'Use {INDEX} to append index number for each above line.'}
                   </FormDescription>
                 </FormItem>
               )}

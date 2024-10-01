@@ -1,4 +1,5 @@
-import _ from "lodash";
+import _ from 'lodash';
+
 import {
   CAMEL_CASE,
   SNAKE_CASE,
@@ -6,7 +7,7 @@ import {
   ARG_INDEX,
   ARG_ORIGINAL_VALUE,
   ARG_CONVERTED_VALUE,
-} from "@/constants/text";
+} from '@/constants/text';
 
 type Options = {
   prefix: string;
@@ -14,19 +15,13 @@ type Options = {
   prepend: string;
 };
 
-export function convertText(
-  text: string,
-  toStyle: string,
-  { prefix, suffix, prepend }: Options
-) {
+export function convertText(text: string, toStyle: string, { prefix, suffix, prepend }: Options) {
   if (!_.isEmpty(prepend)) {
-    prepend = prepend.concat("\n");
+    prepend = prepend.concat('\n');
   }
 
-  let displayText = "";
-  const lines = text
-    .split("\n")
-    .filter((line) => !_.chain(line).trim().isEmpty().value());
+  let displayText = '';
+  const lines = text.split('\n').filter((line) => !_.chain(line).trim().isEmpty().value());
   lines.forEach((line, index) => {
     const replacedArgLine = line.replace(ARG_INDEX, index.toString());
     const convertedLine = applyConversionStyle(replacedArgLine, toStyle);
@@ -35,10 +30,10 @@ export function convertText(
       .replace(ARG_INDEX, index.toString())
       .replace(ARG_ORIGINAL_VALUE, replacedArgLine)
       .replace(ARG_CONVERTED_VALUE, convertedLine);
-    const endOfLine = lines.length - 1 === index ? "" : "\n";
+    const endOfLine = lines.length - 1 === index ? '' : '\n';
 
     displayText = displayText.concat(
-      `${replacedArgPrepend}${prefix}${convertedLine}${suffix}${endOfLine}`
+      `${replacedArgPrepend}${prefix}${convertedLine}${suffix}${endOfLine}`,
     );
   });
 
