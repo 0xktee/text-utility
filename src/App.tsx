@@ -1,4 +1,4 @@
-import { SubmitErrorHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,6 @@ import LineCountBadge from '@/components/line-count-badge';
 import PresetDropdown from '@/components/preset-dropdown';
 import { convertText } from '@/lib/conversion';
 import { FormSchema } from '@/lib/schema';
-import { toast } from '@/hooks/use-toast';
 import { CAMEL_CASE, TEXT_STYLES } from '@/constants/text';
 
 export default function App() {
@@ -33,9 +32,7 @@ export default function App() {
     defaultValues: { toStyle: CAMEL_CASE },
   });
 
-  form.watch('input');
-
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  const onSubmit = (data: z.infer<typeof FormSchema>) => {
     console.log(data);
     if (data.input && data.toStyle) {
       const resultText = convertText(data.input, data.toStyle, {
@@ -46,22 +43,11 @@ export default function App() {
 
       form.setValue('output', resultText);
     }
-  }
-
-  const onError: SubmitErrorHandler<z.infer<typeof FormSchema>> = (error) => {
-    console.error(error);
-    toast({
-      title: 'Input invalid:',
-      // description: error
-    });
   };
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit, onError)}
-        className="relative w-full h-screen p-8"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full h-screen p-8">
         <div className="flex h-full space-x-6">
           <div className="flex-1">
             <div className="flex flex-col h-full space-y-2">
@@ -166,8 +152,11 @@ export default function App() {
                   <FormControl>
                     <Textarea className="resize-none" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    {'Use {INDEX} to append index number for each above line.'}
+                  <FormDescription className="flex flex-col">
+                    Use arguments listed below to add dynamic value into each prepend:
+                    <span>{'- {INDEX}'}</span>
+                    <span>{'- {ORIGINAL_VALUE}'}</span>
+                    <span>{'- {CONVERTED_VALUE}'}</span>
                   </FormDescription>
                 </FormItem>
               )}
