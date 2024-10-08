@@ -1,5 +1,4 @@
 import _ from 'lodash';
-
 import {
   CAMEL_CASE,
   SNAKE_CASE,
@@ -23,21 +22,41 @@ export function convertText(text: string, toStyle: string, { prefix, suffix, pre
   let displayText = '';
   const lines = text.split('\n').filter((line) => !_.chain(line).trim().isEmpty().value());
   lines.forEach((line, index) => {
-    const replacedArgLine = line.replace(ARG_INDEX, index.toString());
-    const convertedLine = applyConversionStyle(replacedArgLine, toStyle);
+    const convertedLine = applyConversionStyle(line, toStyle);
 
-    const replacedArgPrepend = prepend
-      .replace(ARG_INDEX, index.toString())
-      .replace(ARG_ORIGINAL_VALUE, replacedArgLine)
-      .replace(ARG_CONVERTED_VALUE, convertedLine);
+    const replacedArgPrefix = replaceArg(prefix, {
+      index: index,
+      originalValue: line,
+      convertedValue: convertedLine,
+    });
+    const replacedArgSuffix = replaceArg(suffix, {
+      index: index,
+      originalValue: line,
+      convertedValue: convertedLine,
+    });
+    const replacedArgPrepend = replaceArg(prepend, {
+      index: index,
+      originalValue: line,
+      convertedValue: convertedLine,
+    });
     const endOfLine = lines.length - 1 === index ? '' : '\n';
 
     displayText = displayText.concat(
-      `${replacedArgPrepend}${prefix}${convertedLine}${suffix}${endOfLine}`,
+      `${replacedArgPrepend}${replacedArgPrefix}${convertedLine}${replacedArgSuffix}${endOfLine}`,
     );
   });
 
   return displayText;
+}
+
+function replaceArg(
+  textToReplace: string,
+  args: { index: number; originalValue: string; convertedValue: string },
+) {
+  return textToReplace
+    .replace(ARG_INDEX, args.index.toString())
+    .replace(ARG_ORIGINAL_VALUE, args.originalValue)
+    .replace(ARG_CONVERTED_VALUE, args.convertedValue);
 }
 
 function applyConversionStyle(text: string, toStyle: string) {

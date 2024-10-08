@@ -1,4 +1,5 @@
 import { useFormContext } from 'react-hook-form';
+import { ResetIcon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -23,20 +24,35 @@ export default function PresetDropdown() {
     }
   };
 
+  const reset = () => {
+    setValue('toStyle', '');
+    setValue('prefix', '');
+    setValue('suffix', '');
+    setValue('prepend', '');
+  };
+
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">Presets</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-64">
-          {SETTING_PRESETS.map((preset, index) => (
-            <DropdownMenuItem key={index} onClick={() => handlePresetSelection(preset.value)}>
-              {preset.label}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex space-x-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="button" className="flex-1" variant="outline">
+              Select Preset
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-64">
+            {SETTING_PRESETS.map((preset, index) => (
+              <DropdownMenuItem key={index} onClick={() => handlePresetSelection(preset.value)}>
+                {preset.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <Button type="button" variant="outline" size="icon" onClick={() => reset()}>
+          <ResetIcon className="h-4 w-4" />
+        </Button>
+      </div>
     </>
   );
 }

@@ -152,23 +152,24 @@ export default function App() {
                   <FormControl>
                     <Textarea className="resize-none" {...field} />
                   </FormControl>
-                  <FormDescription className="flex flex-col">
-                    Use arguments listed below to add dynamic value into each prepend:
-                    <span>{'- {INDEX}'}</span>
-                    <span>{'- {ORIGINAL_VALUE}'}</span>
-                    <span>{'- {CONVERTED_VALUE}'}</span>
-                  </FormDescription>
                 </FormItem>
               )}
             />
 
-            <Button className="w-full" type="submit">
+            <Button type="submit" className="w-full">
               Convert
             </Button>
 
             <Separator />
 
             <PresetDropdown />
+
+            <p className="flex flex-col text-[0.8rem] text-muted-foreground">
+              Use arguments listed below to add dynamic value into each line:
+              <span>{'- {INDEX}'}</span>
+              <span>{'- {ORIGINAL_VALUE}'}</span>
+              <span>{'- {CONVERTED_VALUE}'}</span>
+            </p>
           </div>
         </div>
       </form>
